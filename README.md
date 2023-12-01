@@ -28,6 +28,7 @@ If you would like to know more about it, you can read about it here: <https://ad
 
  - https://gitlab.com/kodfodrasz/advent-of-code-2018
  - https://gitlab.com/kodfodrasz/advent-of-code-2020
+ - https://github.com/kodfodrasz/advent-of-code-2022
 
 ## TODO
 
