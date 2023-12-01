@@ -74,6 +74,7 @@ let lol (line:string) =
   // configing training ligature protection
     .Replace("one", "onee") // oneight -> oneeight, etc...
     .Replace("three", "three")
+    .Replace("two", "twoo")
     .Replace("nine", "ninee")
     .Replace("eight", "eightt")
     // all to text, probably redundant
@@ -103,6 +104,12 @@ let lol (line:string) =
            |> (fun i -> 10 * Seq.head i + Seq.last i))
 
 let answer2  (strings: string list) =
+  //let differentParses = 
+  //  strings
+  //  |> Seq.map (fun l -> (l, evilLigatureParser l, lol l))
+  //  |> Seq.where (fun (_,b,c) -> b <> c)
+  //  |> Seq.toList
+
   let numbers = 
     strings
     |> Seq.map evilLigatureParser
