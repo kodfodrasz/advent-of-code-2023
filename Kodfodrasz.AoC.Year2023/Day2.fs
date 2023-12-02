@@ -41,18 +41,25 @@ let parseLine (line: string) =
   | _ -> None
 
 let parseInput (input: string): Result<Game list, string> =
-    //input.Split('\n')
-    //|> Seq.map String.trim
-    //|> Seq.where String.notNullOrWhiteSpace
-    //|> Seq.map parseLine
-    //|> Seq.toList
-    //|> Ok
-    Error "TODO"
+    input.Split('\n')
+    |> Seq.map String.trim
+    |> Seq.where String.notNullOrWhiteSpace
+    |> Seq.map (parseLine >> Option.get)
+    |> Seq.toList
+    |> Ok
 
-let answer1 games =
-  Error "TODO"
+let limits = { Red = 12; Green = 13; Blue = 14; }
+let answer1 (games :Game list) =
+  let possible (hand : Handful) =
+    hand.Red <= limits.Red && hand.Green <= limits.Green && hand.Blue <= limits.Blue 
 
-let answer2  games =
+  games
+  |> Seq.where (fun game -> game.Pulls |> Seq.forall possible)
+  |> Seq.sumBy (fun game -> game.Id)
+  |> Ok
+  
+
+let answer2 games =
   Error "TODO"
 
 type Solver() =
