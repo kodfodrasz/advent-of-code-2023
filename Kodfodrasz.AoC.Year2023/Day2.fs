@@ -48,8 +48,9 @@ let parseInput (input: string): Result<Game list, string> =
     |> Seq.toList
     |> Ok
 
-let limits = { Red = 12; Green = 13; Blue = 14; }
 let answer1 (games :Game list) =
+  let limits = { Red = 12; Green = 13; Blue = 14; }
+  
   let possible (hand : Handful) =
     hand.Red <= limits.Red && hand.Green <= limits.Green && hand.Blue <= limits.Blue 
 
@@ -60,7 +61,17 @@ let answer1 (games :Game list) =
   
 
 let answer2 games =
-  Error "TODO"
+  let emptyHand = {Red = 0; Green = 0; Blue = 0}
+
+  let folder (acc :Handful) (curr:Handful) = 
+    { Red = Math.Max(acc.Red, curr.Red);
+      Green = Math.Max(acc.Green, curr.Green);
+      Blue = Math.Max(acc.Blue, curr.Blue); }
+
+  games
+  |> Seq.map (fun game -> game.Pulls |> Seq.fold folder emptyHand)
+  |> Seq.sumBy (fun minpossible -> minpossible.Red * minpossible.Green * minpossible.Blue)
+  |> Ok
 
 type Solver() =
   inherit SolverBase("Cube Conundrum")
