@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Array2D.fs" />
     <Compile Include="Seq.fs" />
     <Compile Include="String.fs" />
     <Compile Include="Result.fs" />
