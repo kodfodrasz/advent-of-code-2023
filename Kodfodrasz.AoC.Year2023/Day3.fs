@@ -38,8 +38,7 @@ type Accumulator1 =
   | NotDigit of PartNumber list
 
 let surroundingCells (data : char array2d) (pn: PartNumber) = 
-  let indexes = 
-    seq {
+  seq {
     let rowMaxIdx = Array2D.length1 data - 1
     let colMaxIdx = Array2D.length2 data - 1
     
@@ -70,10 +69,13 @@ let surroundingCells (data : char array2d) (pn: PartNumber) =
     if pn.StartIndex.Column > 0 then
       yield (pn.StartIndex.Row, pn.StartIndex.Column - 1)
     }
-    |> Seq.toArray
+  |> Seq.map (fun (row, col) -> 
+      let char = Array2D.get data row col
+      row, col, char)
 
-  indexes 
-  |> Seq.map (fun (r, c) -> Array2D.get data r c)
+let surroundingChars (data : char array2d) (pn: PartNumber) = 
+  surroundingCells data pn 
+  |> Seq.map (fun (row, col, char) -> char)
 
 let answer1 (data : char array2d) =
   let empty = NotDigit([])
@@ -120,7 +122,7 @@ let answer1 (data : char array2d) =
   let keep = 
     numbers
     |> Seq.where (fun n ->
-      let surrounding = surroundingCells data n |> Seq.toArray
+      let surrounding = surroundingChars data n |> Seq.toArray
       let any = Seq.exists isSymbol surrounding
       any)
   
@@ -128,8 +130,67 @@ let answer1 (data : char array2d) =
   |> Seq.sumBy (fun pn -> pn.Value)
   |> Ok
 
-let answer2 games =
-  Error "TODO"
+let answer2 data =
+  // BEGIN COPY-PASTE
+  let empty = NotDigit([])
+
+  let charsToPartnum startidx (chars : char array) = 
+    let str = String(chars)
+    let value = Parse.parseInt str |> Option.get // I know all items are digits!
+
+    { 
+      Value = value; 
+      StringValue = str; 
+      StartIndex = startidx; 
+      EndIndex = { startidx with Column = (startidx.Column + chars.Length - 1) }
+    }
+
+  let folder row col (acc:Accumulator1) (c:char) = 
+      match acc with
+      | NotDigit (pns) when c |> isDigit -> DigitSpan ([c] , {Row=row; Column = col}, pns)
+      | DigitSpan (rd, start, pns ) when (c |> isDigit) -> 
+          if(start.Row = row) then
+            // additional digit to number being parsed
+            DigitSpan (c ::rd , start, pns)
+          else
+            let partnum = Seq.rev rd |> Seq.toArray |> charsToPartnum start
+            DigitSpan ([c] , {Row=row; Column = col}, partnum :: pns)
+      | DigitSpan (rd, start, pns ) when not(c |> isDigit) -> 
+        let partnum = Seq.rev rd |> Seq.toArray |> charsToPartnum start
+        NotDigit (partnum :: pns)
+      | _ -> acc
+
+  let numbers = 
+    Array2D.foldi data folder empty
+    |> function
+    | DigitSpan (rd, start, pns ) -> 
+      // last cell was a digit, and it has not been pushed to the result list!
+      let row = Array2D.length1 data - 1
+      let col = Array2D.length2 data - 1
+      let partnum = Seq.rev rd |> Seq.toArray |> charsToPartnum start
+      partnum :: pns 
+    | NotDigit(pns) -> pns
+    |> Seq.rev
+    |> Seq.toArray
+  // END COPY-PASTE
+  let map = Map.empty
+  
+  let groups = 
+    numbers
+    |> Seq.collect( fun n -> 
+        surroundingCells data n 
+        |> Seq.choose (function
+            | (row, col, '*') -> Some (row, col, n)
+            | _ -> None))
+    |> Seq.groupBy(fun (r, c, n) -> (r,c))
+
+  let pairs =
+    groups
+    |> Seq.where (fun (key, values) -> 2 = Seq.length values) 
+
+  pairs
+  |> Seq.sumBy (fun (key, values) -> values |> Seq.map (fun (_,_,pn) -> pn.Value) |> Seq.fold (*) 1 )
+  |> Ok
 
 type Solver() =
   inherit SolverBase("Gear Ratios")
