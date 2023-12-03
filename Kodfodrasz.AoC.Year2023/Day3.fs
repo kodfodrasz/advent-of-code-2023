@@ -33,7 +33,7 @@ let isSymbol (c : char) = not(Char.IsDigit(c) || c = '.')
 let getChar (arr: char array2d) (idx : Index) = 
   Array2D.get arr idx.Row idx.Column
 
-type Accumulator1 = 
+type PreviousCell = 
   | DigitSpan of revdigits : char list * start : Index * numbers: PartNumber list
   | NotDigit of PartNumber list
 
@@ -77,7 +77,7 @@ let surroundingChars (data : char array2d) (pn: PartNumber) =
   surroundingCells data pn 
   |> Seq.map (fun (row, col, char) -> char)
 
-let answer1 (data : char array2d) =
+let findNumbers (data : char array2d) =
   let empty = NotDigit([])
 
   let charsToPartnum startidx (chars : char array) = 
@@ -91,7 +91,10 @@ let answer1 (data : char array2d) =
       EndIndex = { startidx with Column = (startidx.Column + chars.Length - 1) }
     }
 
-  let folder row col (acc:Accumulator1) (c:char) = 
+  // Note: After consultation about the solution it became clear that the logic could be wastly simplified
+  //       by extending the input with a '.' terminator column, which would cut most edgecases 
+  //       in folder and in the retrieval of the possible last pending number at sequence end
+  let folder row col (acc:PreviousCell) (c:char) = 
       match acc with
       | NotDigit (pns) when c |> isDigit -> DigitSpan ([c] , {Row=row; Column = col}, pns)
       | DigitSpan (rd, start, pns ) when (c |> isDigit) -> 
@@ -106,89 +109,45 @@ let answer1 (data : char array2d) =
         NotDigit (partnum :: pns)
       | _ -> acc
 
+  Array2D.foldi data folder empty
+  |> function
+  | DigitSpan (rd, start, pns ) -> 
+    // last cell was a digit, and it has not been pushed to the result list!
+    let partnum = Seq.rev rd |> Seq.toArray |> charsToPartnum start
+    partnum :: pns 
+  | NotDigit(pns) -> pns
+  |> Seq.rev
+
+let answer1 (data : char array2d) =
   let numbers = 
-    Array2D.foldi data folder empty
-    |> function
-    | DigitSpan (rd, start, pns ) -> 
-      // last cell was a digit, and it has not been pushed to the result list!
-      let row = Array2D.length1 data - 1
-      let col = Array2D.length2 data - 1
-      let partnum = Seq.rev rd |> Seq.toArray |> charsToPartnum start
-      partnum :: pns 
-    | NotDigit(pns) -> pns
-    |> Seq.rev
+    findNumbers data
     |> Seq.toArray
 
-  let keep = 
+  let hasSymbolNeighbour = ((surroundingChars data (* n *)) >> (Seq.exists isSymbol)) // Seq.exists is the same as Enumerable.Any
+  let realPartNumbers = 
     numbers
-    |> Seq.where (fun n ->
-      let surrounding = surroundingChars data n |> Seq.toArray
-      let any = Seq.exists isSymbol surrounding
-      any)
-  
-  keep
+    |> Seq.where hasSymbolNeighbour
+
+  realPartNumbers
   |> Seq.sumBy (fun pn -> pn.Value)
   |> Ok
 
 let answer2 data =
-  // BEGIN COPY-PASTE
-  let empty = NotDigit([])
-
-  let charsToPartnum startidx (chars : char array) = 
-    let str = String(chars)
-    let value = Parse.parseInt str |> Option.get // I know all items are digits!
-
-    { 
-      Value = value; 
-      StringValue = str; 
-      StartIndex = startidx; 
-      EndIndex = { startidx with Column = (startidx.Column + chars.Length - 1) }
-    }
-
-  let folder row col (acc:Accumulator1) (c:char) = 
-      match acc with
-      | NotDigit (pns) when c |> isDigit -> DigitSpan ([c] , {Row=row; Column = col}, pns)
-      | DigitSpan (rd, start, pns ) when (c |> isDigit) -> 
-          if(start.Row = row) then
-            // additional digit to number being parsed
-            DigitSpan (c ::rd , start, pns)
-          else
-            let partnum = Seq.rev rd |> Seq.toArray |> charsToPartnum start
-            DigitSpan ([c] , {Row=row; Column = col}, partnum :: pns)
-      | DigitSpan (rd, start, pns ) when not(c |> isDigit) -> 
-        let partnum = Seq.rev rd |> Seq.toArray |> charsToPartnum start
-        NotDigit (partnum :: pns)
-      | _ -> acc
-
   let numbers = 
-    Array2D.foldi data folder empty
-    |> function
-    | DigitSpan (rd, start, pns ) -> 
-      // last cell was a digit, and it has not been pushed to the result list!
-      let row = Array2D.length1 data - 1
-      let col = Array2D.length2 data - 1
-      let partnum = Seq.rev rd |> Seq.toArray |> charsToPartnum start
-      partnum :: pns 
-    | NotDigit(pns) -> pns
-    |> Seq.rev
+    findNumbers data
     |> Seq.toArray
-  // END COPY-PASTE
-  let map = Map.empty
   
-  let groups = 
-    numbers
-    |> Seq.collect( fun n -> 
-        surroundingCells data n 
-        |> Seq.choose (function
-            | (row, col, '*') -> Some (row, col, n)
-            | _ -> None))
-    |> Seq.groupBy(fun (r, c, n) -> (r,c))
-
-  let pairs =
-    groups
-    |> Seq.where (fun (key, values) -> 2 = Seq.length values) 
-
-  pairs
+  numbers
+  |> Seq.collect( fun n -> // this is a flatMap
+      surroundingCells data n 
+      |> Seq.choose (function // this is combination of where and map
+          | (row, col, '*') -> Some (row, col, n)
+          | _ -> None))
+  // Group numbers neighbouring a symbol based on symbol indices
+  |> Seq.groupBy(fun (r, c, n) -> (r,c))
+  // filter the groups for those stars with exactly 2 neighbours
+  |> Seq.where (fun (key, values) -> 2 = Seq.length values)
+  // sum the product of the group values
   |> Seq.sumBy (fun (key, values) -> values |> Seq.map (fun (_,_,pn) -> pn.Value) |> Seq.fold (*) 1 )
   |> Ok
 
