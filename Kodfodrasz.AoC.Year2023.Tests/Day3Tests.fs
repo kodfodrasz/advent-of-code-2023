@@ -43,7 +43,7 @@ let ``surroundingCells test`` () =
 
   test
     <@ 
-      "12348cba95".ToCharArray() = (Day3.surroundingCells data {
+      "12348cba95".ToCharArray() = (Day3.surroundingChars data {
       StartIndex = { Row = 1; Column = 1;};
       EndIndex = { Row = 1; Column = 2;};
       StringValue = ""; Value = 0 } |> Seq.toArray)
@@ -56,7 +56,7 @@ let ``surroundingCells test 2`` () =
   let expected = 
     "....*....".ToCharArray();
   let actual =
-    Day3.surroundingCells data {
+    Day3.surroundingChars data {
       StartIndex = { Row = 4; Column = 0;};
       EndIndex = { Row = 4; Column = 2;};
       StringValue = "617"; Value = 617 } 
