@@ -10,6 +10,9 @@ type Game = {
   Numbers: int list
 }
 
+type System.Int32 with
+  member i.oneOf l = List.contains i l
+
 let parseLine (line: string) : Game option = 
   // EXAMPLE: Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
   // PUZZLE : Card   1: 73 92 13 35 18 96 37 72 76 39 | 82 14 66 57 25 98 49 28  3 95 81 85 31 30 16 79  7 12 55 19 97 45  9 58  2
@@ -23,14 +26,14 @@ let parseLine (line: string) : Game option =
         |> Seq.choose (fun c -> c.Value |> Parse.parseInt) 
         |> Seq.toList
         |> function
-          | l when 5 = List.length l || 10 = List.length l  -> Some l
+          | l when (List.length l) .oneOf [5; 10] -> Some l
           | _ -> None
       let numsMaybe = 
         m.Groups.["having"].Captures 
         |> Seq.choose (fun c -> c.Value |> Parse.parseInt) 
         |> Seq.toList
         |> function
-          | l when 8 = List.length l || 25 = List.length l -> Some l
+          | l when (List.length l) .oneOf [8; 25] -> Some l
           | _ -> None
       idMaybe, winNumsMaybe, numsMaybe
     | _ -> None, None, None
@@ -55,7 +58,6 @@ let gameRewardCardIds (game : Game) =
 let answer1 games =
   games
   |> Seq.sumBy gameValue
-  |> sprintf "%i"
   |> Ok
 
 let answer2 games =
@@ -75,7 +77,6 @@ let answer2 games =
   let scratched = scratch (initial, [])
 
   List.length scratched 
-  |> sprintf "%i (part 2 functional style)"
   |> Ok
 
 let answer2fast games =
@@ -98,12 +99,19 @@ let answer2fast games =
   done
 
   Array.sum cards
-  |> sprintf "%i (part 2 imperative style)"
   |> Ok
 
 type Solver() =
   inherit SolverBase("Scratchcards")
   with
     override this.Solve input =
-      this.DoSolve (Parse.parsePuzzleInputLines parseLine) [ answer1; answer2fast; answer2 ] input
+      this.DoSolve
+        (Parse.parsePuzzleInputLines parseLine) 
+        [ 
+          answer1 >> note "";
+          answer2fast >> note "part 2 imperative style: FAST!!!";
+          answer2 >> note "part 2 functional style: slooooooow...";
+        ]
+        input
 
+let parseInput = Parse.parsePuzzleInputLines parseLine

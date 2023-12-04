@@ -197,3 +197,7 @@ type SolverBase(name) as this =
     member this.Day = this.Day
     member this.Name = this.Name
     member this.Solve input = this.Solve input
+
+let note msg = 
+  if msg |> String.isNullOrWhiteSpace then Result.map (sprintf "%A")
+  else Result.map (fun i -> sprintf "%A (%s)" i msg)
