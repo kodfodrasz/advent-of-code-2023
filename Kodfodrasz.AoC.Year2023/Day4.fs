@@ -53,13 +53,36 @@ let gameValue (game : Game) =
     0
   else 1 <<< (intersect.Count - 1)
 
+let gameRewardCardIds (game : Game) = 
+  let w = Set.ofList game.WinningNumbers
+  let n = Set.ofList game.Numbers
+  let intersect = Set.intersect w n
+
+  Seq.init intersect.Count (fun i -> game.Id + i + 1)
+  |> Seq.toList
+
 let answer1 games =
   games
   |> Seq.sumBy gameValue
   |> Ok
 
 let answer2 games =
-  Error "TODO"
+  let lut = games |> Seq.map (fun g -> (g.Id, g)) |> Map.ofSeq
+
+  let rec scratch = 
+    function
+    | ([],scratched) -> List.rev scratched
+    | (card :: unscratched, scratched ) ->
+      let game = Map.find card lut
+      let rewards = gameRewardCardIds game
+      if rewards |> List.isEmpty then scratch (unscratched, game :: scratched)
+      else scratch (rewards @ unscratched, game :: scratched)
+
+  let initial = lut.Keys |> Seq.sort |> Seq.toList
+
+  let scratched = scratch (initial, [])
+
+  List.length scratched |> Ok
 
 type Solver() =
   inherit SolverBase("Scratchcards")
