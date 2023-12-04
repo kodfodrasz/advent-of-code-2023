@@ -36,15 +36,6 @@ let parseLine (line: string) : Game option =
     | _ -> None, None, None
   |||> Option.map3 (fun i w n -> {Id=i; WinningNumbers=w; Numbers=n;})
 
-let parseInput (input: string): Result<Game list, string> =
-    input.Split('\n')
-    |> Seq.map String.trim
-    |> Seq.where String.notNullOrWhiteSpace
-    // TODO: Error Handling instead of Seq.choose!
-    |> Seq.choose parseLine
-    |> Seq.toList
-    |> Ok
-
 let gameValue (game : Game) = 
   let w = Set.ofList game.WinningNumbers
   let n = Set.ofList game.Numbers
