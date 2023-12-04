@@ -64,6 +64,7 @@ let gameRewardCardIds (game : Game) =
 let answer1 games =
   games
   |> Seq.sumBy gameValue
+  |> sprintf "%i"
   |> Ok
 
 let answer2 games =
@@ -82,7 +83,9 @@ let answer2 games =
 
   let scratched = scratch (initial, [])
 
-  List.length scratched |> Ok
+  List.length scratched 
+  |> sprintf "%i (part 2 functional style)"
+  |> Ok
 
 let answer2fast games =
   let gameWinCount (game : Game) = 
@@ -104,6 +107,7 @@ let answer2fast games =
   done
 
   Array.sum cards
+  |> sprintf "%i (part 2 imperative style)"
   |> Ok
 
 type Solver() =
