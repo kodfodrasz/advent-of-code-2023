@@ -88,5 +88,5 @@ type Solver() =
   inherit SolverBase("Scratchcards")
   with
     override this.Solve input =
-      this.DoSolve parseInput [ answer1; answer2 ] input
+      this.DoSolve (Parse.parsePuzzleInputLines parseLine) [ answer1; answer2 ] input
 

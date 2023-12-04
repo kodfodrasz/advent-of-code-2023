@@ -28,3 +28,27 @@ let tryParseDay s =
   DateTime.TryParseExact(s, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None)
 
 let parseDay = tryParseWith tryParseDay
+
+// Puzzle inputs
+
+let parsePuzzleInputLines (parseLine : string -> 'O option) (input: string) : Result<'O list, string> =
+  let mapValidate parseLine (lines: string seq) = 
+    let mutable errorLine = null
+    use e = lines.GetEnumerator()
+    let mutable state = []
+
+    while (errorLine |> isNull) && e.MoveNext() do
+        parseLine e.Current
+        |> function
+        | Some v -> state <- v :: state
+        | None -> errorLine <- e.Current
+    done
+
+    if (errorLine |> isNull) then Ok (List.rev state)
+    else Error (sprintf "Error parsing line: %s" errorLine)
+
+  input.Split('\n')
+  |> Seq.map String.trim
+  |> Seq.skipWhile String.isNullOrEmpty
+  |> Seq.where String.notNullOrWhiteSpace
+  |> mapValidate parseLine
