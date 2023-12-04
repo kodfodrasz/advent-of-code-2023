@@ -84,9 +84,31 @@ let answer2 games =
 
   List.length scratched |> Ok
 
+let answer2fast games =
+  let gameWinCount (game : Game) = 
+    let w = Set.ofList game.WinningNumbers
+    let n = Set.ofList game.Numbers
+    let intersect = Set.intersect w n
+    intersect.Count
+
+  let wins = games |> Seq.map gameWinCount |> Seq.toArray
+  let cards = Array.init (List.length games) (fun _ -> 1)
+
+  for i in 0 .. cards.Length - 1 do
+    if wins[i] <> 0 then
+      for j in 1 .. wins[i] do
+        let target = i + j
+        if target < cards.Length then
+          cards[target] <- cards[target] + cards[i]
+      done
+  done
+
+  Array.sum cards
+  |> Ok
+
 type Solver() =
   inherit SolverBase("Scratchcards")
   with
     override this.Solve input =
-      this.DoSolve (Parse.parsePuzzleInputLines parseLine) [ answer1; answer2 ] input
+      this.DoSolve (Parse.parsePuzzleInputLines parseLine) [ answer1; answer2fast; answer2 ] input
 

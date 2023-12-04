@@ -46,3 +46,11 @@ let ``Answer 2 for example input`` () =
   test
     <@ let actual = Result.bind answer2 input
       Ok 30 = actual @>
+
+[<Fact>]
+let ``Answer 2 FAST!!! for example input`` () =
+  let input = parseInput exampleInput
+       
+  test
+    <@ let actual = Result.bind answer2fast input
+      Ok 30 = actual @>
