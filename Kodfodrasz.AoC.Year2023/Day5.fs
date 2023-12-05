@@ -4,13 +4,13 @@ open System
 open System.Text.RegularExpressions
 open Kodfodrasz.AoC
 
-type Seeds = int list
+type Seeds = int64 list
 
 type AlmanacMapItem = 
   {
-    Source: int
-    Dest: int
-    Length: int
+    Source: int64
+    Dest: int64
+    Length: int64
   }
 type AlmanacMap = AlmanacMapItem list
 
@@ -32,7 +32,7 @@ let parseSeeds line : Result<Seeds, string> =
   | m when m.Success -> 
       m.Groups["seed"].Captures 
       // the regexp mathced, so parse will always be successful!
-      |> Seq.choose (fun c -> Parse.parseInt c.Value)
+      |> Seq.choose (fun c -> Parse.parseInt64 c.Value)
       |> Seq.toList 
       |> Ok
   | _ -> Error <| sprintf "Error parsing seeds.\n  line:\n%s" line
@@ -57,7 +57,7 @@ let parseBlock name (block:string) : Result<AlmanacMap, string>=
       let items = 
         (m.Groups["to"].Captures, m.Groups["from"].Captures, m.Groups["len"].Captures)
         |||> Seq.map3 (fun t f l -> 
-          (Parse.parseInt t.Value, Parse.parseInt f.Value, Parse.parseInt l.Value)
+          (Parse.parseInt64 t.Value, Parse.parseInt64 f.Value, Parse.parseInt64 l.Value)
           |> function
             | Some ti, Some fi, Some li -> Ok { Dest = ti; Source = fi; Length = li}
             | _ -> error "integer parse error!")
