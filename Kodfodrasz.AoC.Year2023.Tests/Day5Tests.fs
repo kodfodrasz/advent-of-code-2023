@@ -322,13 +322,12 @@ let ``parsing actual input`` () =
   test
     <@ Result.isOk actual @>
 
-//[<Fact>]
-//let ``Answer 1 for example input`` () =
-//  let input = parseInput exampleInput
-
-//  test
-//    <@ let actual = Result.bind answer1 input
-//       Ok 13 = actual @>
+[<Fact>]
+let ``Answer 1 for example input`` () =
+  let input = parseInput exampleInput
+  let actual = Result.bind answer1 input
+  test
+    <@ Ok 35L = actual @>
 
 
 //[<Fact>]

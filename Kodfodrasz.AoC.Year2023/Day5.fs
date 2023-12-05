@@ -148,10 +148,30 @@ let parseInput (input : string) : Result<Almanac,string> =
   |  _ -> Error "Unexpected number of maps parsed."
 
 
-let answer1 games =
-  Error "TODO"
+let answer1 (almanac : Almanac) =
+  let lookup (map : AlmanacMap) num = 
+    map 
+    |> Seq.where(fun m -> m.Source <= num && num < m.Source + m.Length)
+    |> Seq.sortByDescending(fun m -> m.Source)
+    |> Seq.tryHead
+    |> Option.map( fun mapping -> num - mapping.Source + mapping.Dest)
+    |> Option.defaultValue num
 
-let answer2 games =
+  let seed2location = 
+    (lookup almanac.SeedToSoilMap)
+    >> (lookup almanac.SoilToFertilizerMap)
+    >> (lookup almanac.FertilizerToWaterMap)
+    >> (lookup almanac.WaterToLightMap)
+    >> (lookup almanac.LightToTemperatureMap)
+    >> (lookup almanac.TemperatureToHumidityMap)
+    >> (lookup almanac.HumidityToLocationMap)
+
+  almanac.Seeds
+  |> List.map seed2location
+  |> List.min
+  |> Ok
+
+let answer2 (almanac : Almanac) =
   Error "TODO"
 
 type Solver() =
