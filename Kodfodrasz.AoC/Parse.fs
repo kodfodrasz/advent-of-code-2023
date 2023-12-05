@@ -31,7 +31,7 @@ let parseDay = tryParseWith tryParseDay
 
 // Puzzle inputs
 
-let parsePuzzleInputLines (parseLine : string -> 'O option) (input: string) : Result<'O list, string> =
+let parsePuzzleInputLines (parseLine : string -> _ option) (input: string) : Result<_ list, string> =
   let mapValidate parseLine (lines: string seq) = 
     let mutable errorLine = null
     use e = lines.GetEnumerator()
