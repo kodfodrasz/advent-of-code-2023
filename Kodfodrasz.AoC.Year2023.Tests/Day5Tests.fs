@@ -330,10 +330,9 @@ let ``Answer 1 for example input`` () =
     <@ Ok 35L = actual @>
 
 
-//[<Fact>]
-//let ``Answer 2 for example input`` () =
-//  let input = parseInput exampleInput
-       
-//  test
-//    <@ let actual = Result.bind answer2 input
-//      Ok 30 = actual @>
+[<Fact>]
+let ``Answer 2 for example input`` () =
+  let input = parseInput exampleInput
+  let actual = Result.bind answer2 input
+  test
+    <@ Ok 46L = actual @>

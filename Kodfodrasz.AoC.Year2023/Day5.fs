@@ -148,31 +148,38 @@ let parseInput (input : string) : Result<Almanac,string> =
   |  _ -> Error "Unexpected number of maps parsed."
 
 
+let lookup (map : AlmanacMap) num = 
+  map 
+  |> Seq.where(fun m -> m.Source <= num && num < m.Source + m.Length)
+  |> Seq.sortByDescending(fun m -> m.Source)
+  |> Seq.tryHead
+  |> Option.map( fun mapping -> num - mapping.Source + mapping.Dest)
+  |> Option.defaultValue num
+
+let seed2location (almanac : Almanac) = 
+  (lookup almanac.SeedToSoilMap)
+  >> (lookup almanac.SoilToFertilizerMap)
+  >> (lookup almanac.FertilizerToWaterMap)
+  >> (lookup almanac.WaterToLightMap)
+  >> (lookup almanac.LightToTemperatureMap)
+  >> (lookup almanac.TemperatureToHumidityMap)
+  >> (lookup almanac.HumidityToLocationMap)
+
 let answer1 (almanac : Almanac) =
-  let lookup (map : AlmanacMap) num = 
-    map 
-    |> Seq.where(fun m -> m.Source <= num && num < m.Source + m.Length)
-    |> Seq.sortByDescending(fun m -> m.Source)
-    |> Seq.tryHead
-    |> Option.map( fun mapping -> num - mapping.Source + mapping.Dest)
-    |> Option.defaultValue num
-
-  let seed2location = 
-    (lookup almanac.SeedToSoilMap)
-    >> (lookup almanac.SoilToFertilizerMap)
-    >> (lookup almanac.FertilizerToWaterMap)
-    >> (lookup almanac.WaterToLightMap)
-    >> (lookup almanac.LightToTemperatureMap)
-    >> (lookup almanac.TemperatureToHumidityMap)
-    >> (lookup almanac.HumidityToLocationMap)
-
   almanac.Seeds
-  |> List.map seed2location
+  |> List.map (seed2location almanac)
   |> List.min
   |> Ok
 
 let answer2 (almanac : Almanac) =
-  Error "TODO"
+  almanac.Seeds
+  |> List.chunkBySize 2
+  |> List.collect (function
+    | [s; l] -> List.init ((int)l) ((int64)>>(+) s)
+    | _ -> [])
+  |> List.map (seed2location almanac)
+  |> List.min
+  |> Ok
 
 type Solver() =
   inherit SolverBase("If You Give A Seed A Fertilizer")
