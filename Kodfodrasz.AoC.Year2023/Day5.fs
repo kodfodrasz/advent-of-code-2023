@@ -233,17 +233,26 @@ let answer2fast (almanac : Almanac) =
   let inputs = 
     almanac.Seeds
     |> List.chunkBySize 2
-    |> List.map (fun [s; l] -> { Seed = s; From = s; Length = l; }) // I don't care about other cases now
+    |> Seq.choose (function
+      |[s; l] -> Some { Seed = s; From = s; Length = l; } // I don't care about other cases now
+      | _ -> None)
+    |> Seq.toList
 
-  inputs
-  |> (splitMap almanac.SeedToSoilMap)
-  |> (splitMap almanac.SoilToFertilizerMap)
-  |> (splitMap almanac.FertilizerToWaterMap)
-  |> (splitMap almanac.WaterToLightMap)
-  |> (splitMap almanac.LightToTemperatureMap)
-  |> (splitMap almanac.TemperatureToHumidityMap)
-  |> (splitMap almanac.HumidityToLocationMap)
-  |> Ok
+  let mapped = 
+    inputs
+    |> (splitMap almanac.SeedToSoilMap)
+    |> (splitMap almanac.SoilToFertilizerMap)
+    |> (splitMap almanac.FertilizerToWaterMap)
+    |> (splitMap almanac.WaterToLightMap)
+    |> (splitMap almanac.LightToTemperatureMap)
+    |> (splitMap almanac.TemperatureToHumidityMap)
+    |> (splitMap almanac.HumidityToLocationMap)
+  
+  let lowest = 
+    mapped
+    |> Seq.minBy(fun vr -> vr.From)
+
+  Ok lowest.Seed
    
 type Solver() =
   inherit SolverBase("If You Give A Seed A Fertilizer")
@@ -257,4 +266,3 @@ type Solver() =
           answer1;
           answer2;
         ]
-
