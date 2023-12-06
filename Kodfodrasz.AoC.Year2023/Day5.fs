@@ -187,49 +187,49 @@ type ValueRange = {
   Length:  Int64
 }
 
+let doMap (mapping:AlmanacMapItem) num =
+  num - mapping.Source + mapping.Dest
+
+let tryMapOverlapBefore (map:AlmanacMapItem) (valueRange : ValueRange) : ValueRange option =
+  let mS = map.Source
+  let mE = map.Source + map.Length - 1L
+  let sS = valueRange.From
+  let sE = valueRange.From + valueRange.Length - 1L
+
+  if mS <= sS && sS <= mE 
+  then 
+    Some { 
+      Seed = valueRange.Seed; 
+      From = (max sS mS |> doMap map); 
+      Length = (min sE mE |> doMap map) - sS + 1L }
+  else None
+
+let tryMapOverlapAfter (map:AlmanacMapItem) (valueRange : ValueRange) : ValueRange option =
+  let mS = map.Source
+  let mE = map.Source + map.Length - 1L
+  let sS = valueRange.From
+  let sE = valueRange.From + valueRange.Length - 1L
+
+  if mS < sE && mS <= sE
+  then 
+    Some { 
+      Seed = valueRange.Seed; 
+      From = (max sS mS |> doMap map); 
+      Length = (min sE mE |> doMap map) - sS + 1L }
+  else None
+
+let splitMap (map:AlmanacMap) values =
+  values
+  |> Seq.collect (fun v -> seq {
+        for m in map do
+          yield tryMapOverlapBefore m v
+          yield tryMapOverlapBefore m v
+        done
+    })
+  |> Seq.choose id
+  |> Seq.toList
+
 let answer2fast (almanac : Almanac) =
-  let doMap (mapping:AlmanacMapItem) num =
-    num - mapping.Source + mapping.Dest
-
-  let tryMapOverlapBefore (map:AlmanacMapItem) (valueRange : ValueRange) : ValueRange option =
-    let mS = map.Source
-    let mE = map.Source + map.Length - 1L
-    let sS = valueRange.From
-    let sE = valueRange.From + valueRange.Length - 1L
-
-    if mS <= sS && sS <= mE 
-    then 
-      Some { 
-        Seed = valueRange.Seed; 
-        From = (max sS mS |> doMap map); 
-        Length = (min sE mE |> doMap map) - sS + 1L }
-    else None
-  
-  let tryMapOverlapAfter (map:AlmanacMapItem) (valueRange : ValueRange) : ValueRange option =
-    let mS = map.Source
-    let mE = map.Source + map.Length - 1L
-    let sS = valueRange.From
-    let sE = valueRange.From + valueRange.Length - 1L
-
-    if mS < sE && mS <= sE
-    then 
-      Some { 
-        Seed = valueRange.Seed; 
-        From = (max sS mS |> doMap map); 
-        Length = (min sE mE |> doMap map) - sS + 1L }
-    else None
-
-  let splitMap (map:AlmanacMap) values =
-    values
-    |> Seq.collect (fun v -> seq {
-          for m in map do
-            yield tryMapOverlapBefore m v
-            yield tryMapOverlapBefore m v
-          done
-      })
-    |> Seq.choose id
-    |> Seq.toList
-
   let inputs = 
     almanac.Seeds
     |> List.chunkBySize 2

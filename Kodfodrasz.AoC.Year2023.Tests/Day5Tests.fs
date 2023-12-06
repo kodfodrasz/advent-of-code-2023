@@ -344,3 +344,83 @@ let ``Answer 2 fast solution for example input`` () =
   let actual = Result.bind answer2fast input
   test
     <@ Ok 46L = actual @>
+
+[<Fact>]
+let ``splitmap no overlap left`` () =
+  let map = [ 
+    { Source = 1L; Length = 9L; Dest = 101L; }]
+  let valueRange =
+    { From = 10L; Length = 10; Seed = 42L; }
+  let actual = splitMap map [ valueRange ]
+  
+  let expected = []
+  test
+    <@ expected = actual @>
+
+[<Fact>]
+let ``splitmap no overlap right`` () =
+  let map = [ 
+    { Source = 20L; Length = 9L; Dest = 101L; }]
+  let valueRange =
+    { From = 10L; Length = 10; Seed = 42L; }
+  let actual = splitMap map [ valueRange ]
+  
+  let expected = []
+  test
+    <@ expected = actual @>
+
+[<Fact>]
+let ``splitmap partial overlap left`` () =
+  let map = [ 
+    { Source = 5L; Length = 10L; Dest = 95L; }]
+  let valueRange =
+    { From = 10L; Length = 10; Seed = 42L; }
+  let actual = splitMap map [ valueRange ]
+  
+  let expected = [
+    { From = 100L; Length = 5L; Seed = 42L; }
+  ]
+  test
+    <@ expected = actual @>
+
+[<Fact>]
+let ``splitmap partial overlap right`` () =
+  let map = [ 
+    { Source = 15L; Length = 10L; Dest = 105L; }]
+  let valueRange =
+    { From = 10L; Length = 10; Seed = 42L; }
+  let actual = splitMap map [ valueRange ]
+  
+  let expected = [
+    { From = 100L; Length = 5L; Seed = 42L; }
+  ]
+  test
+    <@ expected = actual @>
+
+[<Fact>]
+let ``splitmap total overlap narrow map`` () =
+  let map = [ 
+    { Source = 11L; Length = 8L; Dest = 111L; }]
+  let valueRange =
+    { From = 10L; Length = 10; Seed = 42L; }
+  let actual = splitMap map [ valueRange ]
+  
+  let expected = [
+    { From = 111L; Length = 8L; Seed = 42L; }
+  ]
+  test
+    <@ expected = actual @>
+
+[<Fact>]
+let ``splitmap total overlap wide map`` () =
+  let map = [ 
+    { Source = 0L; Length = 30L; Dest = 100L; }]
+  let valueRange =
+    { From = 10L; Length = 10; Seed = 42L; }
+  let actual = splitMap map [ valueRange ]
+  
+  let expected = [
+    { From = 100L; Length = 10L; Seed = 42L; }
+  ]
+  test
+    <@ expected = actual @>
