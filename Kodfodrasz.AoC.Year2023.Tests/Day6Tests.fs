@@ -17,9 +17,9 @@ Distance:  9  40  200
 let ``parsing example input`` () =
   let expected = 
     Ok [
-      { Time = 7; WinningDistance = 9;}
-      { Time = 15; WinningDistance = 40;}
-      { Time = 30; WinningDistance = 200;}
+      { Time = 7L; WinningDistance = 9L;}
+      { Time = 15L; WinningDistance = 40L;}
+      { Time = 30L; WinningDistance = 200L;}
     ] : Result<Race list,string>
 
   test
@@ -29,12 +29,12 @@ let ``parsing example input`` () =
 [<Fact>]
 let ``charge for first example`` () =
   test
-    <@ 4 = charge { Time = 7; WinningDistance = 9;} @>
+    <@ 4 = charge { Time = 7L; WinningDistance = 9L;} @>
 
 [<Fact>]
 let ``charge for third example`` () =
   test
-    <@ 9 = charge { Time = 30; WinningDistance = 200;} @>
+    <@ 9 = charge { Time = 30L; WinningDistance = 200L;} @>
 
 [<Fact>]
 let ``Answer 1 for example input`` () =
@@ -44,9 +44,9 @@ let ``Answer 1 for example input`` () =
     <@ Ok 288 = actual @>
 
 
-//[<Fact>]
-//let ``Answer 2 for example input`` () =
-//  let input = parseInput exampleInput
-//  let actual = Result.bind answer2 input
-//  test
-//    <@ Ok 46L = actual @>
+[<Fact>]
+let ``Answer 2 for example input`` () =
+  let input = parseInput exampleInput
+  let actual = Result.bind answer2 input
+  test
+    <@ Ok 71503 = actual @>

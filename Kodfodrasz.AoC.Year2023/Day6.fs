@@ -5,8 +5,8 @@ open System.Text.RegularExpressions
 open Kodfodrasz.AoC
 
 type Race = {
-  Time: int
-  WinningDistance : int
+  Time: int64
+  WinningDistance : int64
 }
 
 let parseInput (input : string) : Result<Race list,string> = 
@@ -18,11 +18,11 @@ let parseInput (input : string) : Result<Race list,string> =
       let times = 
         m.Groups["time"].Captures 
         // the regexp mathced, so parse will always be successful!
-        |> Seq.choose (fun c -> Parse.parseInt c.Value)
+        |> Seq.choose (fun c -> Parse.parseInt64 c.Value)
       let dists = 
         m.Groups["dist"].Captures 
         // the regexp mathced, so parse will always be successful!
-        |> Seq.choose (fun c -> Parse.parseInt c.Value)
+        |> Seq.choose (fun c -> Parse.parseInt64 c.Value)
       
       (times, dists)
       ||> Seq.zip 
@@ -80,7 +80,18 @@ let answer1 (races : Race list) =
   |> Ok
 
 let answer2 (races : Race list) =
-  Error "TODO"
+  // I'd rather not reparse the input in this framework
+  let raceMaybe = 
+    races
+    |> Seq.fold (fun (t,d) r -> (sprintf "%s%i" t r.Time), sprintf "%s%i" d r.WinningDistance) ("" , "")
+    |> function
+    | (t,d) -> 
+      ((Parse.parseInt64 t), (Parse.parseInt64 d))
+      ||> Option.map2 (fun ti di -> {Time = ti; WinningDistance = di;})
+
+  raceMaybe
+  |> Result.ofOption "Could not reparse race data"
+  |> Result.map charge
 
 type Solver() =
   inherit SolverBase("Wait For It")
