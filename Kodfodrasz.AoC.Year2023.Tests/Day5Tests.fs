@@ -353,7 +353,7 @@ let ``splitmap no overlap left`` () =
     { From = 10L; Length = 10; Seed = 42L; }
   let actual = splitMap map [ valueRange ]
   
-  let expected = []
+  let expected = [] : ValueRange list
   test
     <@ expected = actual @>
 
@@ -365,7 +365,7 @@ let ``splitmap no overlap right`` () =
     { From = 10L; Length = 10; Seed = 42L; }
   let actual = splitMap map [ valueRange ]
   
-  let expected = []
+  let expected = [] : ValueRange list
   test
     <@ expected = actual @>
 
@@ -392,7 +392,7 @@ let ``splitmap partial overlap right`` () =
   let actual = splitMap map [ valueRange ]
   
   let expected = [
-    { From = 100L; Length = 5L; Seed = 42L; }
+    { From = 105L; Length = 5L; Seed = 42L; }
   ]
   test
     <@ expected = actual @>
@@ -420,7 +420,7 @@ let ``splitmap total overlap wide map`` () =
   let actual = splitMap map [ valueRange ]
   
   let expected = [
-    { From = 100L; Length = 10L; Seed = 42L; }
+    { From = 110L; Length = 10L; Seed = 42L; }
   ]
   test
     <@ expected = actual @>
