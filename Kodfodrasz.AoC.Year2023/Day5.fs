@@ -4,7 +4,7 @@ open System
 open System.Text.RegularExpressions
 open Kodfodrasz.AoC
 
-type Seeds = int64 list
+type Seeds = int64 array
 
 type AlmanacMapItem = 
   {
@@ -12,7 +12,7 @@ type AlmanacMapItem =
     Dest: int64
     Length: int64
   }
-type AlmanacMap = AlmanacMapItem list
+type AlmanacMap = AlmanacMapItem array
 
 type Almanac = {
   Seeds : Seeds;
@@ -33,7 +33,7 @@ let parseSeeds line : Result<Seeds, string> =
       m.Groups["seed"].Captures 
       // the regexp mathced, so parse will always be successful!
       |> Seq.choose (fun c -> Parse.parseInt64 c.Value)
-      |> Seq.toList 
+      |> Seq.toArray 
       |> Ok
   | _ -> Error <| sprintf "Error parsing seeds.\n  line:\n%s" line
 
@@ -69,7 +69,12 @@ let parseBlock name (block:string) : Result<AlmanacMap, string>=
       | _, items -> 
         match List.tryFind Result.isError items with
         | Some (Error (e)) -> Error e // Just to adapt Result<int, string> -> Result<AlmanacMap,string>
-        | _ -> items |> List.map Result.get |> Ok
+        | _ -> 
+          items 
+          |> Seq.map Result.get 
+          |> Seq.sortBy (fun i -> i.Source)
+          |> Seq.toArray
+          |> Ok
   | _ -> error "format error"
 
 
@@ -150,9 +155,8 @@ let parseInput (input : string) : Result<Almanac,string> =
 
 let lookup (map : AlmanacMap) num = 
   map 
-  |> Seq.where(fun m -> m.Source <= num && num < m.Source + m.Length)
-  |> Seq.sortByDescending(fun m -> m.Source)
-  |> Seq.tryHead
+  |> Array.where(fun m -> m.Source <= num && num < m.Source + m.Length)
+  |> Array.tryHead
   |> Option.map( fun mapping -> num - mapping.Source + mapping.Dest)
   |> Option.defaultValue num
 
@@ -167,18 +171,22 @@ let seed2location (almanac : Almanac) =
 
 let answer1 (almanac : Almanac) =
   almanac.Seeds
-  |> List.map (seed2location almanac)
-  |> List.min
+  |> Array.map (seed2location almanac)
+  |> Array.min
   |> Ok
 
 let answer2 (almanac : Almanac) =
-  almanac.Seeds
-  |> List.chunkBySize 2
-  |> List.collect (function
-    | [s; l] -> List.init ((int)l) ((int64)>>(+) s)
-    | _ -> [])
-  |> List.map (seed2location almanac)
-  |> List.min
+  let seeds= 
+    almanac.Seeds
+    |> Array.chunkBySize 2
+    |> Seq.collect (function
+      | [| s; l |] -> Seq.init ((int)l) ((int64)>>(+) s)
+      | _ -> [||])
+
+  seeds
+  |> Seq.chunkBySize 10000
+  |> Seq.map (Array.Parallel.map (seed2location almanac) >> Seq.min)
+  |> Seq.min
   |> Ok
 
 type Solver() =
