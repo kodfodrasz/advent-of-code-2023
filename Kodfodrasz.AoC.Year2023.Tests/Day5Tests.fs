@@ -10,7 +10,7 @@ open Kodfodrasz.AoC.Year2023.Day5
 [<Fact>]
 let ``parsing example seeds line`` () =
   let line = "seeds: 79 14 55 13"
-  let expected= Ok [79; 14; 55; 13;] : Result<Seeds,string>
+  let expected= Ok [| 79; 14; 55; 13; |] : Result<Seeds,string>
 
   test
     <@ let actual = parseSeeds line
@@ -23,10 +23,10 @@ let ``parsing example seed-to-soil map`` () =
     50 98 2
     52 50 48"""
   let expected =
-    Ok [
-      { Dest = 50; Source = 98; Length = 2};
+    Ok [|
       { Dest = 52; Source = 50; Length = 48};
-    ] : Result<AlmanacMap,string>
+      { Dest = 50; Source = 98; Length = 2};
+    |] : Result<AlmanacMap,string>
 
   test
     <@ let actual = parseBlock "seed-to-soil" block
@@ -72,32 +72,39 @@ humidity-to-location map:
 let ``parsing example input`` () =
   let expected = 
     Ok {
-      Seeds = [79; 14; 55; 13;];
-      SeedToSoilMap = [
+      Seeds = [| 79; 14; 55; 13; |];
+      SeedToSoilMap = [|
+        { Dest = 52; Source = 50; Length = 48}; 
         { Dest = 50; Source = 98; Length = 2};
-        { Dest = 52; Source = 50; Length = 48};];
-      SoilToFertilizerMap = [
+        |];
+      SoilToFertilizerMap = [|
+        { Dest = 39; Source = 0 ; Length = 15; }; 
         { Dest = 0; Source = 15 ; Length = 37; };
         { Dest = 37; Source = 52 ; Length = 2; };
-        { Dest = 39; Source = 0 ; Length = 15; };];
-      FertilizerToWaterMap = [
-        { Dest = 49; Source = 53; Length = 8; };
-        { Dest = 0; Source = 11; Length = 42; };
+        |];
+      FertilizerToWaterMap = [|
         { Dest = 42; Source = 0; Length = 7; };
-        { Dest = 57; Source = 7; Length = 4; };];
-      WaterToLightMap = [
+        { Dest = 57; Source = 7; Length = 4; };
+        { Dest = 0; Source = 11; Length = 42; };
+        { Dest = 49; Source = 53; Length = 8; };
+        |];
+      WaterToLightMap = [|
         { Dest = 88; Source = 18; Length = 7; };
-        { Dest = 18; Source = 25; Length = 70; };];
-      LightToTemperatureMap = [
-        { Dest = 45; Source = 77; Length = 23; };
+        { Dest = 18; Source = 25; Length = 70; };
+        |];
+      LightToTemperatureMap = [|
         { Dest = 81; Source = 45; Length = 19; };
-        { Dest = 68; Source = 64; Length = 13; };];
-      TemperatureToHumidityMap = [
+        { Dest = 68; Source = 64; Length = 13; };
+        { Dest = 45; Source = 77; Length = 23; };
+        |];
+      TemperatureToHumidityMap = [|
+        { Dest = 1; Source = 0; Length = 69; };
         { Dest = 0; Source = 69; Length = 1; };
-        { Dest = 1; Source = 0; Length = 69; };];
-      HumidityToLocationMap = [
+        |];
+      HumidityToLocationMap = [|
         { Dest = 60; Source = 56; Length = 37; };
-        { Dest = 56; Source = 93; Length = 4; };];
+        { Dest = 56; Source = 93; Length = 4; };
+        |];
     } : Result<Almanac,string>
 
   test
