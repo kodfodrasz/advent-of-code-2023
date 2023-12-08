@@ -42,3 +42,9 @@ let batchByPredicate predicate (sequence: seq<_>) =
     yield List.ofSeq l
   }
   |> Seq.filter (List.isEmpty >> not)
+
+let repeatInfinite (source : _ seq) = 
+  seq {
+    while true do
+      yield! source
+  }
