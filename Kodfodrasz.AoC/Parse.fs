@@ -31,6 +31,28 @@ let parseDay = tryParseWith tryParseDay
 
 // Puzzle inputs
 
+let takeLine (strings: string seq) : string option = 
+  strings 
+  |> Seq.skipWhile String.isNullOrEmpty 
+  |> Seq.takeWhile String.notNullOrEmpty 
+  |> Seq.tryExactlyOne
+
+let takeBlock (strings: string seq) : string option =
+  let block = 
+    strings
+    |> Seq.skipWhile String.isNullOrEmpty
+    |> Seq.takeWhile String.notNullOrEmpty 
+    |> String.join "\n"
+  if String.isNullOrWhiteSpace block then None
+  else Some block
+
+let consumeableSeq (source : _ seq) = 
+  let e = source.GetEnumerator()
+  seq {
+    while e.MoveNext() do
+      yield e.Current
+  }
+
 let parsePuzzleInputLines (parseLine : string -> _ option) (input: string) : Result<_ list, string> =
   let mapValidate parseLine (lines: string seq) = 
     let mutable errorLine = null
