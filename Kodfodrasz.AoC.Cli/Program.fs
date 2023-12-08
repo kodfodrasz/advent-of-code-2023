@@ -165,6 +165,7 @@ let buildAutofacContainer () =
   builder
     .RegisterAssemblyTypes(assemblies)
     .AssignableTo<ISolver>()
+    .Where(fun t -> t |> AdventOfCode.hasIgnoreSolverAttribute |> not)
     .Named<ISolver>(fun solverType -> $"{Conventions.solverYear (solverType)}-{Conventions.solverDay (solverType)}")
     .AsImplementedInterfaces()
     .AsSelf()

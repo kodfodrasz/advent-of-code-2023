@@ -92,7 +92,19 @@ and Input =
       Ok { Data = input }
     with ex -> Error $"Unexpected error [{ex.GetType().FullName}]: {ex.Message}"
 
+[<AttributeUsage(AttributeTargets.Class ||| AttributeTargets.Module, AllowMultiple = false)>]
+type IgnoreSolverAttribute(note: string) =
+   inherit System.Attribute()
+   member val Note: string = note with get, set
 
+
+let rec hasIgnoreSolverAttribute (t: Type) =
+  let attributes = t.GetCustomAttributes(typeof<IgnoreSolverAttribute>, true)
+  if attributes.Length > 0 then true
+  else
+      match t.DeclaringType with
+      | null -> false
+      | dt -> hasIgnoreSolverAttribute dt
 
 module Conventions =
   let private isSolver (solverType: Type) =
