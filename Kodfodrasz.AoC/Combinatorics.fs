@@ -1,6 +1,6 @@
 [<AutoOpen>]
 [<RequireQualifiedAccess>]
-module Combinatorics
+module Kodfodrasz.AoC.Combinatorics
 
 /// Factorial
 ///  see: https://en.wikipedia.org/wiki/Factorial
