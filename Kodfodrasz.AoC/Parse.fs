@@ -29,6 +29,10 @@ let tryParseDay s =
 
 let parseDay = tryParseWith tryParseDay
 
+// Regex helpers
+let captureValue (capture : System.Text.RegularExpressions.Capture) =
+  capture.Value
+
 // Puzzle inputs
 
 let takeLine (strings: string seq) : string option = 
