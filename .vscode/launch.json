@@ -1,0 +1,25 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+      "version": "0.2.0",
+      "configurations": [
+        {
+          "name": "Kodfodrasz.AoC.Cli",
+          "type": "coreclr",
+          "request": "launch",
+          "preLaunchTask": "Build: Kodfodrasz.AoC.Cli.fsproj",
+          "program": "${workspaceFolder}/Kodfodrasz.AoC.Cli/bin/Debug/net7.0/Kodfodrasz.AoC.Cli.dll",
+          "args": [],
+          "cwd": "${workspaceFolder}",
+          "stopAtEntry": false,
+          "env": {
+            "ASPNETCORE_ENVIRONMENT": "Development",
+            "AOC_INPUT_DIR": "${workspaceFolder}/Inputs"
+          },
+          "envFile": "${workspaceFolder}/.env",
+          "console": "integratedTerminal",
+        }
+      ]
+    }
+    
