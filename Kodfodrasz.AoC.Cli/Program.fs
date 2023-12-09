@@ -180,6 +180,9 @@ let enumerateSolvers (container: IContainer): ISolver seq =
 [<EntryPoint>]
 let main argv =
   try
+    // Set a global default Regex timeout
+    AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromSeconds(10))
+
     PrintBanner AocYear
 
     use container = buildAutofacContainer ()
