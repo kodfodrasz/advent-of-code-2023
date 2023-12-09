@@ -10,4 +10,5 @@ if [ -f .env ]; then
 fi
 
 export AOC_SESSION_COOKIE
-dotnet run --project Kodfodrasz.AoC.Cli/Kodfodrasz.AoC.Cli.fsproj
+export AOC_DATA_DIR=${AOC_DATA_DIR:=Input}
+dotnet run --no-launch-profile --project Kodfodrasz.AoC.Cli/Kodfodrasz.AoC.Cli.fsproj
