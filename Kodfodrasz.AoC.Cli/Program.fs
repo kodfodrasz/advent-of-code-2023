@@ -59,7 +59,7 @@ module UserMenu =
     | Invalid
 
   let parseCommand (input: string) =
-    input.Trim().ToLower()
+    (input |> Option.ofObj |> Option.defaultValue "quit").Trim().ToLower()
     |> function
     | ""
     | "last" -> Last
