@@ -50,7 +50,11 @@ let answer1 (data : int64 array array) : Result<int64, string> =
   |> Ok
 
 let answer2 data =
-  failwith "TODO"
+  data
+  |> Array.Parallel.map (genDiff >> Array.map Array.head>> Array.reduceBack (-))
+  |> Array.Parallel.sum
+  |> Ok
+
 
 type Solver() =
   inherit SolverBase(solverName)

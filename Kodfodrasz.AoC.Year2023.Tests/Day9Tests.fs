@@ -34,9 +34,9 @@ let ``Answer 1 for example input`` () =
  test
    <@ Ok 114L = actual @>
 
-//[<Fact>]
-//let ``Answer 2 for example input`` () =
-//  let input = parseInput exampleInput
-//  let actual = Result.bind answer2 input
-//  test
-//    <@ Ok 5905L = actual @>
+[<Fact>]
+let ``Answer 2 for example input`` () =
+ let input = parseInput exampleInput
+ let actual = Result.bind answer2 input
+ test
+   <@ Ok 2L = actual @>
