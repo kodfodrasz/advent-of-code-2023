@@ -346,3 +346,6 @@ healthchecksdb
 
 # Project temporary files
 Input/input*.txt
+
+# Environment file with private session cookies
+.env
