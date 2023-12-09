@@ -1,0 +1,14 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "msbuild",
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build",
+			"label": "Build: Kodfodrasz.AoC.Cli.fsproj",
+			"detail": "Build the Kodfodrasz.AoC.Cli.fsproj project using dotnet build"
+		}
+	]
+}
