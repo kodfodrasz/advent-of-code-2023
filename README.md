@@ -30,13 +30,56 @@ If you would like to know more about it, you can read about it here: <https://ad
  - https://gitlab.com/kodfodrasz/advent-of-code-2020
  - https://github.com/kodfodrasz/advent-of-code-2022
 
+## How to run it?
+
+### Compile it yourself
+
+1. ensure you have at least [.Net SDK 8.0](https://dotnet.microsoft.com/en-us/download) installed
+2. clone the repository
+3. change directory to the cloned repository root
+2. set two environment variables:
+  - `AOC_DATA_DIR` to a directory path where the downloaded puzzle inputs will be cached.
+  - `AOC_SESSION_COOKIE` is needed to download the puzzle inputs if not found in the cache. You can get it from your browser using web inspector after logging in to the AoC site.
+3. `dotnet run -c Release --project .\Kodfodrasz.AoC.Cli\Kodfodrasz.AoC.Cli.fsproj`
+
+### Run a precompiled version
+
+TODO: create a CI build.
+
+#### Compile a single file binary
+
+This mostly a note to self at the moment
+
+1. ensure you have at least [.Net SDK 8.0](https://dotnet.microsoft.com/en-us/download) installed
+2. clone the repository
+3. change directory to the cloned repository root
+4. build a single file binary
+
+    ```powershell
+    # This example is for powershell
+    # You may need to change the platform identifier [RID](https://learn.microsoft.com/en-us/dotnet/core/compatibility/sdk/8.0/rid-graph). 
+    $target_rid="win-x64"
+    dotnet publish -c Release `
+      -f net8.0 -r $target_rid `
+      --self-contained true `
+      -p:PublishSingleFile=true `
+      -p:EnableCompressionInSingleFile=true `
+      -p:IncludeAllContentForSelfExtract=yes `
+      .\Kodfodrasz.AoC.Cli\Kodfodrasz.AoC.Cli.fsproj
+
+    $result_dir="Kodfodrasz.AoC.Cli\bin\Release\net8.0\$target_rid\publish\"
+    echo "The binary is in $result_dir" 
+    ```
+5. You can now run the binary on another computer, and it doesn't need to have the relevant .Net Runtime/SDK installed!
+   The environment variables `AOC_DATA_DIR` and `AOC_SESSION_COOKIE` mentioned above will still needed to be set up on the target machine
+
 ## TODO
 
 There are lots of stuff missing from the library used to solve the puzzles.
 
 ### Missing algorithms from the library
 
-#### Handy comparision combinators
+#### Handy comparison combinators
 
  [ ] Between (inclusive, exclusive, upper/lower inclusive)
 
