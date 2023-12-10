@@ -152,14 +152,24 @@ let puzzleSortId (p: Puzzle) = sprintf "%4i-%2i" p.Year p.Day
 let buildAutofacContainer () =
   let builder = new ContainerBuilder()
 
+  let alreadyLoaded = 
+    AppDomain.CurrentDomain.GetAssemblies()
+    |> Seq.map(fun a -> a.FullName)
+    |> Set.ofSeq
   let isAocRuntimeAssembly (a: Assembly) =
     a.FullName.StartsWith("Kodfodrasz.AoC")
+    && not (alreadyLoaded |> Set.contains a.FullName)
     && not (a.FullName.Contains("Test", StringComparison.InvariantCultureIgnoreCase))
 
-  let assemblies =
+  let assemblies = 
     Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll")
-    |> Seq.map Assembly.LoadFrom
+    |> Seq.choose( fun p -> 
+        try
+          let a = Assembly.LoadFrom(p)
+          Option.ofObj a
+        with _ -> None)
     |> Seq.filter isAocRuntimeAssembly
+    |> Seq.distinct
     |> Seq.toArray
 
   builder
