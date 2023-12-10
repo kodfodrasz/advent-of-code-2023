@@ -3,7 +3,7 @@
     "Kodfodrasz.AoC.Cli": {
       "commandName": "Project",
       "environmentVariables": {
-        "AOC_DATA_DIR": "$(SolutionDir)\\Input"
+        "AOC_DATA_DIR": "Input"
       }
     }
   }
