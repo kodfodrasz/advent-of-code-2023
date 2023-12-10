@@ -9,7 +9,7 @@
           "type": "coreclr",
           "request": "launch",
           "preLaunchTask": "Build: Kodfodrasz.AoC.Cli.fsproj",
-          "program": "${workspaceFolder}/Kodfodrasz.AoC.Cli/bin/Debug/net7.0/Kodfodrasz.AoC.Cli.dll",
+          "program": "${workspaceFolder}/Kodfodrasz.AoC.Cli/bin/Debug/net8.0/Kodfodrasz.AoC.Cli.dll",
           "args": [],
           "cwd": "${workspaceFolder}",
           "stopAtEntry": false,
