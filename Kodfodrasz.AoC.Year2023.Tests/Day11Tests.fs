@@ -42,8 +42,15 @@ let ``Answer 1 for example input`` () =
    <@ Ok 374L = actual @>
 
 [<Fact>]
-let ``Answer 2 for example input`` () =
+let ``Answer 2 with lower metric 10 for example input`` () =
  let input = parseInput exampleInput
- let actual = Result.bind answer2 input
+ let actual = Result.map (fun d -> expando d 10) input
  test
-   <@ Ok 2L = actual @>
+   <@ Ok 1030L = actual @>
+
+[<Fact>]
+let ``Answer 2 with lower metric 100 for example input`` () =
+ let input = parseInput exampleInput
+ let actual = Result.map (fun d -> expando d 100) input
+ test
+   <@ Ok 8410L = actual @>
