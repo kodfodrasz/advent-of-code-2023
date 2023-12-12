@@ -57,11 +57,19 @@ let arrangements pattern (damages : int list)=
 let answer1 (data : HotSpring list) =
   data
   |> List.toArray
-  |> Array.Parallel.sumBy (fun hs -> arrangements hs.Pattern hs.DamagedGroups |> Array.length)
+  |> Array.Parallel.sumBy (fun hs -> arrangements hs.Pattern hs.DamagedGroups |> Array.length |> int64)
   |> Ok
 
-let answer2 (data : _ list) =
-  failwith "TODO"
+let answer2 (data : HotSpring list) =
+  data
+  |> Seq.map (fun hs -> 
+      let pattern = Seq.replicate 5 hs.Pattern |> String.join "?"
+      let damage = Seq.replicate 5 hs.DamagedGroups |> Seq.collect id |> Seq.toList
+      (pattern, damage)
+  ) 
+  |> Seq.toArray
+  |> Array.Parallel.sumBy (fun (pattern, damage) -> arrangements pattern damage |> Array.length |> int64)
+  |> Ok
 
 type Solver() =
   inherit SolverBase(solverName)

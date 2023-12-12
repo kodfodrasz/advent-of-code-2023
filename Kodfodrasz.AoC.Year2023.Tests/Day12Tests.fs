@@ -31,11 +31,11 @@ let ``Answer 1 for example input`` () =
  let input = parseInput exampleInput
  let actual = Result.bind answer1 input
  test
-   <@ Ok 21 = actual @>
+   <@ Ok 21L = actual @>
 
-//[<Fact>]
-//let ``Answer 2 for example input`` () =
-// let input = parseInput exampleInput
-// let actual = Result.bind answer2 input
-// test
-//   <@ Ok 2L = actual @>
+[<Fact>]
+let ``Answer 2 for example input`` () =
+ let input = parseInput exampleInput
+ let actual = Result.bind answer2 input
+ test
+   <@ Ok 525152L = actual @>
