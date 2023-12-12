@@ -59,7 +59,7 @@ let galaxies (data: char array2d) =
         if data[row,col] = SymbolGalaxy then yield (row,col)
   }
 
-let answer1 (data : char array2d) =
+let expando (data : char array2d) (metric:int64) =
   let gals = data |> galaxies |> Seq.toArray
   let (emptyRows, emptyCols) = expansion data
 
@@ -74,7 +74,7 @@ let answer1 (data : char array2d) =
 
   pairs
   |> Array.Parallel.map(fun (g1, g2) ->
-        let dist = manhattan g1 g2
+        let dist = manhattan g1 g2 |> int64
         let extraR = 
           emptyRows 
           |> Array.where (fun r -> 
@@ -82,7 +82,7 @@ let answer1 (data : char array2d) =
             let M = max (fst g1) (fst g2)
             // TODO: between
             m < r && r < M)
-          |> Seq.length
+          |> Seq.length |> int64
         let extraC = 
           emptyCols 
           |> Seq.where (fun r -> 
@@ -90,13 +90,17 @@ let answer1 (data : char array2d) =
             let M = max (snd g1) (snd g2)
             // TODO: between
             m < r && r < M)
-          |> Seq.length
-        dist + extraR + extraC)
+          |> Seq.length |> int64
+        dist + (metric - 1L) * (extraR + extraC))
   |> Array.Parallel.sum
+
+let answer1 (data : char array2d) =
+  expando data 2
   |> Ok
 
 let answer2 (data) =
-  failwith "TODO"
+  expando data 1000000
+  |> Ok
 
 type Solver() =
   inherit SolverBase(solverName)
