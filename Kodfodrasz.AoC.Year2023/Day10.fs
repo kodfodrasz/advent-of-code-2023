@@ -29,7 +29,7 @@ let SymbolHorizontalPipe = '-'
 [<Literal>]
 let SymbolNorthEastPipeBend = 'L'
 [<Literal>]
-let SymbolNortWestPipeBend = 'J' 
+let SymbolNorthWestPipeBend = 'J' 
 [<Literal>]
 let SymbolSouthWestPipeBend = '7'
 [<Literal>]
@@ -38,6 +38,8 @@ let SymbolSouthEastPipeBend = 'F'
 let SymbolGround = '.' 
 [<Literal>]
 let SymbolStartPosition = 'S'
+
+
 
 type Cell = 
   | VerticalPipe 
@@ -113,14 +115,14 @@ type PipeMap = {
 let parseCells (input: char array2d) = 
   // First pass: just assign types to characters as J always confuses me
   let parseCellFirstPass = function
-    | SymbolVerticalPipe-> Cell.VerticalPipe
-    | SymbolHorizontalPipe-> Cell.HorizontalPipe
-    | SymbolNorthEastPipeBend-> Cell.NorthEastPipeBend
-    | SymbolNortWestPipeBend -> Cell.NorthWestPipeBend
-    | SymbolSouthWestPipeBend-> Cell.SouthWestPipeBend
-    | SymbolSouthEastPipeBend-> Cell.SouthEastPipeBend
-    | SymbolStartPosition -> Cell.StartPosition(Ground)
-    | SymbolGround | _ -> Cell.Ground
+    | SymbolVerticalPipe      -> Cell.VerticalPipe
+    | SymbolHorizontalPipe    -> Cell.HorizontalPipe
+    | SymbolNorthEastPipeBend -> Cell.NorthEastPipeBend
+    | SymbolNorthWestPipeBend  -> Cell.NorthWestPipeBend
+    | SymbolSouthWestPipeBend -> Cell.SouthWestPipeBend
+    | SymbolSouthEastPipeBend -> Cell.SouthEastPipeBend
+    | SymbolStartPosition     -> Cell.StartPosition(Ground)
+    | SymbolGround | _        -> Cell.Ground
 
   let output = 
     input 
@@ -205,16 +207,163 @@ let pipeTrail map =
     | Some [| dir1; _ |] -> dir1
     | _ -> failwith "Malformed data? Start position has no valid moves."
 
-  walk [] map.StartPos firstStep
+  walk [map.StartPos] map.StartPos firstStep
 
 let answer1 (map: PipeMap) =
   let pipe = pipeTrail map
 
-  let halfLength = (List.length pipe + 1)/2
+  let halfLength = (List.length pipe)/2
   Ok halfLength
 
-let answer2 (data) =
-  failwith "TODO"
+let rec winding cell step = 
+  match step with
+    | North -> 
+      match cell with
+      | VerticalPipe -> 2
+      | _ -> 1
+    | South -> 
+      match cell with
+      | VerticalPipe -> -2
+      | _ -> -1
+    | East-> 
+      match cell with
+      | StartPosition c -> winding c step
+      | NorthWestPipeBend | SouthEastPipeBend -> 1
+      | NorthEastPipeBend | SouthWestPipeBend -> -1
+      | _ -> 0
+    | West -> 
+      match cell with
+      | StartPosition c -> winding c step
+      | NorthEastPipeBend | SouthWestPipeBend -> 1
+      | NorthWestPipeBend | SouthEastPipeBend -> -1
+      | _ -> 0
+
+
+let pipeTrail2 map = 
+  let rec walk traversed pos step =
+    move step pos
+    |> function
+    | newpos when newpos = map.StartPos -> 
+        (pos, step) :: traversed |> List.rev
+    | newpos -> 
+            let newCell = get map.Grid newpos
+            let nextStep = 
+              getValidMoves newCell
+              |> function
+              | Some [| dir1; dir2 |] -> if opposite step <> dir1 then dir1 else dir2
+              | _ -> failwith "Malformed data? Pipe broken?"
+            walk ((pos, step) :: traversed) newpos nextStep
+
+  let mutable firstStep = 
+    get map.Grid map.StartPos |> getValidMoves 
+    |> function
+    | Some [| dir1; _ |] -> dir1
+    | _ -> failwith "Malformed data? Start position has no valid moves."
+
+  walk [] map.StartPos firstStep
+
+let formatA2d (mapping : 'a -> char) (input : 'a array2d) : string = 
+  let tmp = 
+    input
+    |> Array2D.map mapping
+  seq {
+    for i in 0 .. Array2D.length1 tmp - 1 do
+      let row  = tmp[i,*];
+      String(row)
+  }
+  |> String.join "\n"
+
+let cell2char = function
+| VerticalPipe      -> SymbolVerticalPipe
+| HorizontalPipe    -> SymbolHorizontalPipe
+| NorthEastPipeBend -> SymbolNorthEastPipeBend
+| NorthWestPipeBend -> SymbolNorthWestPipeBend
+| SouthWestPipeBend -> SymbolSouthWestPipeBend
+| SouthEastPipeBend -> SymbolSouthEastPipeBend
+| Ground            -> SymbolGround
+| StartPosition _   -> SymbolStartPosition
+
+// Extra symbols
+[<Literal>]
+let SymbolInnerArea = 'I'
+[<Literal>]
+let SymbolOuterArea = 'O'
+
+let prettyfy = 
+  String.tr "|-LJ7F.SIO" "║═╚╝╗╔ $I░"
+
+let step2char = function
+| North -> '↑'
+| East  -> '→'
+| South -> '↓'
+| West  -> '←'
+
+let winding2char = function
+| 0 -> '0'
+| i when i > 0 -> '+'
+| i when i < 0 -> '-'
+| _ -> failwith "just to silence the compiler"
+ 
+
+let markInnerFields map =
+  let pipe = pipeTrail2 map
+
+  let width = Array2D.length2 map.Grid
+  let height = Array2D.length1 map.Grid
+  let trailmap = Array2D.create height width false
+
+  let windings = Array2D.create height width None
+  let steps = Array2D.create height width None
+
+  let charmap = Array2D.create height width SymbolGround
+
+  for (pos, step) in pipe do
+    set trailmap pos true
+  
+    let cell = get map.Grid pos
+    let w = winding cell step
+    set windings pos (Some w)
+    set steps pos (Some step)
+
+    cell2char cell |> set charmap pos
+
+  let isPipe pos = get trailmap pos
+  let isInside (x,y) = 
+    if isPipe (x,y) then false
+    else 
+      windings[y,*]
+      |> Array.take (x+1)
+      |> Array.sumBy (Option.defaultValue 0)
+      |> (<>)0
+
+  let iterCoords (a : _ array2d) = 
+    seq {
+      for row in 0 .. Array2D.length1 a - 1 do
+        for col in 0 .. Array2D.length2 a - 1 do
+          yield (col, row)
+    }
+
+  let markInner pos = 
+    if isInside pos then 
+      set charmap pos SymbolInnerArea
+    ()
+
+  iterCoords windings
+  |> Seq.iter(markInner)
+
+  let stringMap = charmap |> formatA2d id
+  let prettyStringMap = stringMap |> prettyfy
+  let prettyStepMap = steps |> formatA2d (Option.map step2char >> Option.defaultValue SymbolGround) |> prettyfy
+  let prettyWindingMap = windings |> formatA2d (Option.map winding2char >> Option.defaultValue ' ')
+  (stringMap, prettyStringMap, prettyStepMap, prettyWindingMap)
+
+let answer2 map =
+  let (stringMap, prettyStringMap, steps, windings) = markInnerFields map
+
+  stringMap.ToCharArray()
+  |> Array.where((=)SymbolInnerArea)
+  |> Array.length
+  |> Ok
 
 type Solver() =
   inherit SolverBase(solverName)
