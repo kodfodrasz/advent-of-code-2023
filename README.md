@@ -45,7 +45,7 @@ If you would like to know more about it, you can read about it here: <https://ad
 
 ### Run a precompiled version
 
-TODO: create a CI build.
+No CI releases are planned now.
 
 #### Compile a single file binary
 
@@ -78,6 +78,8 @@ This mostly a note to self at the moment
 
 There are lots of stuff missing from the library used to solve the puzzles.
 
+- [x] CI
+
 ### Missing algorithms from the library
 
 #### Handy comparison combinators
@@ -90,6 +92,7 @@ Edit Distances:
 
 - [ ] Hamming distance (same length)
 - [ ] Lewenstein distance (any length)
+- [ ] Longest Common Substring
 
 #### Graph algorithms
 
