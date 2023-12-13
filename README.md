@@ -16,9 +16,10 @@
 </pre>
 -->
 
-
 What is this? My solutions for the Advent of Code programming challenge in year 2023.
 If you would like to know more about it, you can read about it here: <https://adventofcode.com/>
+
+![CI workflow status](https://github.com/kodfodrasz/advent-of-code-2023/actions/workflows/main.yaml/badge.svg)
 
 ## It is that time of the year again...
 
