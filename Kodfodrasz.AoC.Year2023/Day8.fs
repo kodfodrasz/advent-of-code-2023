@@ -1,7 +1,7 @@
 module Kodfodrasz.AoC.Year2023.Day8
 
 
-#nowarn "57" // Experimental languiage features (Array.Parallel)
+#nowarn "57" // Experimental language features (Array.Parallel)
 
 open System
 open System.Text.RegularExpressions
