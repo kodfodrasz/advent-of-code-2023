@@ -82,6 +82,10 @@ There are lots of stuff missing from the library used to solve the puzzles.
 
 ### Missing algorithms from the library
 
+#### Memoization
+
+- [ ] Memoization helper based on System.Runtime.Caching.MemoryCache
+
 #### Array2D
 
 - [ ] Transpose
