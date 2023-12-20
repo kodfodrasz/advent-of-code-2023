@@ -82,6 +82,18 @@ There are lots of stuff missing from the library used to solve the puzzles.
 
 ### Missing algorithms from the library
 
+#### Array2D
+
+- [ ] Transpose
+- [ ] Rotate CW/CCW 90°, 180°
+- [ ] Mirror X
+- [ ] Mirror Y
+- [ ] Sequential iterator by row
+- [ ] Sequential iterator by column
+- [ ] Extend in each dimension with default value
+- [ ] Apply convolution matrix 3x3
+- [ ] Apply convolution matrix 5x5
+
 #### Handy comparison combinators
 
 - [ ] Between (inclusive, exclusive, upper/lower inclusive)
@@ -93,6 +105,13 @@ Edit Distances:
 - [ ] Hamming distance (same length)
 - [ ] Lewenstein distance (any length)
 - [ ] Longest Common Substring
+
+#### Coordinate Systems / Metrics
+
+- [ ] Manhattan distance
+- [ ] Chebyshev distance
+- [ ] Eucledian distance
+- [ ] Haversine formula (great-circle distance on surface of a sphere)
 
 #### Graph algorithms
 
